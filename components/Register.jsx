@@ -1,57 +1,54 @@
 import React, { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { REGISTER } from "../graphql/mutations"; // Adjust the import based on your GraphQL mutation
-import { Link, useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
+import { registerUser } from "../lib/api";
 import { FaEye, FaEyeSlash, FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import Link from "next/link";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [register, { loading, error }] = useMutation(REGISTER);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
-      const { data } = await register({ 
-        variables: { username, email, password } 
-      });
-      
-      if (data?.createUser?.token) {
-        localStorage.setItem("token", data.createUser.token); // Store the token
-        navigate("/");
-      }
-    } catch (err) {
-      console.error("Registration failed", err);
+      const { token, user } = await registerUser({ username, email, password });
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      toast.success("Registration successful!");
+      router.push("/");
+    } catch (error) {
+      toast.error("Registration failed: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen fixed top-0 right-0 left-0  bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 flex items-center justify-center px-4 py-12">
-      <motion.div 
+    <div className="min-h-screen fixed top-0 right-0 left-0 bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 flex items-center justify-center px-4 py-12">
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
         className="max-w-md w-full bg-white shadow-2xl rounded-2xl overflow-hidden"
       >
         <div className="p-8 space-y-8">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h2 className="text-4xl font-extrabold text-gray-900">
-              Create an Account
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Sign up to get started
-            </p>
+            <h2 className="text-4xl font-extrabold text-gray-900">Create an Account</h2>
+            <p className="mt-2 text-sm text-gray-600">Sign up to get started</p>
           </motion.div>
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -144,7 +141,7 @@ const Register = () => {
             </motion.div>
           </form>
 
-          {error && (
+          {/* {error && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -152,7 +149,7 @@ const Register = () => {
             >
               {error.message}
             </motion.div>
-          )}
+          )} */}
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -163,7 +160,7 @@ const Register = () => {
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
               <Link
-                      to="/login"
+                      href="/login"
                       className="text-indigo-600 hover:text-indigo-800"
                     >
                       Login

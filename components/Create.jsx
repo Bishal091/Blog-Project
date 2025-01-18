@@ -1,67 +1,38 @@
 import React, { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { CREATE_POST } from "../graphql/mutations";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
+import { createPost } from "../lib/api";
 import { motion } from "framer-motion";
 import { FaArrowLeft, FaTag, FaFileAlt, FaRegListAlt, FaPencilAlt, FaCheck } from "react-icons/fa";
-
 
 const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState("");
-  const [createPost, { loading, error }] = useMutation(CREATE_POST);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please login to create a post");
+      router.push("/login");
+      return;
+    }
+
     try {
-      await createPost({
-        variables: {
-          title,
-          content,
-          tags: tags.split(",").map((tag) => tag.trim()),
-        },
-      });
-      navigate("/");
+      await createPost({ title, content, tags: tags.split(",").map((tag) => tag.trim()) }, token);
+      router.push("/");
     } catch (error) {
       console.error("Error creating post:", error);
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { 
-      opacity: 1, 
-      scale: 1,
-      transition: {
-        delayChildren: 0.2,
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100
-      }
-    }
-  };
-
   return (
-<div className="relative min-h-[90vh] bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4 sm:p-6 md:p-8 md:py-4">
-  <button className="absolute top-4 left-4 flex items-center gap-2 text-black" onClick={() => navigate("/")}>
-    <FaArrowLeft
-      className="text-indigo-600 cursor-pointer bg-white rounded-full p-1"
-      size={36}
-    />
-    Back
-  </button>
+    <div className="relative min-h-[90vh] bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4 sm:p-6 md:p-8 md:py-4">
+      <button className="absolute top-4 left-4 flex items-center gap-2 text-black" onClick={() => router.push("/")}>
+        <FaArrowLeft className="text-indigo-600 cursor-pointer bg-white rounded-full p-1" size={36} />
+        Back
+      </button>
       <motion.div
         initial="hidden"
         animate="visible"

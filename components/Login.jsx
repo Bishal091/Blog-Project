@@ -1,65 +1,53 @@
 import React, { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { LOGIN } from "../graphql/mutations";
-import { Link, useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
+import { loginUser } from "../lib/api";
 import { FaEye, FaEyeSlash, FaUser, FaLock } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [login, { loading, error }] = useMutation(LOGIN);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
-      const { data } = await login({ variables: { username, password } });
-  
-      // Store only the token in localStorage
-      localStorage.setItem("token", data.login.token);
-      localStorage.setItem('user', JSON.stringify({
-        id: data.login.user.id,
-        username: data.login.user.username,
-        // Add any other relevant user info
-      }));
-  
-  
-      // Show success notification
-      toast.success("Logged in successfully!");
-  
-      // Redirect to home page
-      navigate("/");
+      const { token, user } = await loginUser({ username, password });
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      toast.success("Login successful!");
+      router.push("/");
     } catch (error) {
       toast.error("Login failed: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen fixed top-0 right-0 left-0 bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 flex items-center justify-center px-4 py-12">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="max-w-md w-full bg-white shadow-2xl rounded-2xl overflow-hidden "
+        className="max-w-md w-full bg-white shadow-2xl rounded-2xl overflow-hidden"
       >
         <div className="p-8 space-y-8">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h2 className="text-4xl font-extrabold text-gray-900">
-              Welcome Back
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Sign in to continue to your account
-            </p>
+            <h2 className="text-4xl font-extrabold text-gray-900">Welcome Back</h2>
+            <p className="mt-2 text-sm text-gray-600">Sign in to continue to your account</p>
           </motion.div>
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -129,8 +117,7 @@ const Login = () => {
               </button>
             </motion.div>
           </form>
-
-          {error && (
+          {/* {error && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -138,7 +125,7 @@ const Login = () => {
             >
               {error.message}
             </motion.div>
-          )}
+          )} */}
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -149,7 +136,7 @@ const Login = () => {
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
               <Link
-                      to="/register"
+                      href="/register"
                       className="text-indigo-600 hover:text-indigo-800"
                     >
                       Signup
