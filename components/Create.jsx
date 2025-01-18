@@ -8,22 +8,51 @@ const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState("");
+  const [error, setError] = useState(null);
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("Please login to create a post");
       router.push("/login");
+      setError("Please login to create a post");
       return;
     }
 
     try {
+      setLoading(true);
       await createPost({ title, content, tags: tags.split(",").map((tag) => tag.trim()) }, token);
+      setLoading(false);
       router.push("/");
+      setError(null);
     } catch (error) {
+      setError(error.message);
       console.error("Error creating post:", error);
+    }
+  };
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: {
+        delayChildren: 0.2,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
     }
   };
 

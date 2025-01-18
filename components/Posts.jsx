@@ -176,7 +176,7 @@ const Posts = () => {
           <p className="text-lg italic tracking-wide text-gray-600">Explore, share, and connect with the community.</p>
         </div>
         <Link
-          href="/create-post"
+          href="/create"
           className="ml-4 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-all duration-300 flex items-center space-x-2"
         >
           <FaEdit />

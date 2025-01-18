@@ -1,11 +1,19 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { FaHeart, FaCode, FaUsers, FaLightbulb, FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
-
+import {
+  FaHeart,
+  FaCode,
+  FaUsers,
+  FaLightbulb,
+  FaGithub,
+  FaLinkedin,
+  FaTwitter,
+} from "react-icons/fa";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 const About = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -25,14 +33,15 @@ const About = () => {
   };
 
   // Check if user is logged in
-  const isLoggedIn = localStorage.getItem("user");
+  const isLoggedIn =
+    typeof window !== "undefined" ? localStorage.getItem("user") : null;
 
   // Handle "Get Started" button click
   const handleGetStarted = () => {
     if (isLoggedIn) {
-      navigate("/create-post"); // Redirect to create post if logged in
+      router.push("/create"); // Redirect to create post if logged in
     } else {
-      navigate("/login"); // Redirect to login if not logged in
+      router.push("/login"); // Redirect to login if not logged in
     }
   };
 
@@ -47,17 +56,21 @@ const About = () => {
         variants={itemVariants}
         className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center"
       >
-        About Our<Link to="/" className="hover:text-green-300  text-3xl sm:text-4xl md:text-5xl flex items-center justify-center ">
-  <span>Burrr</span>
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    className="w-5 h-5 text-green-500"
-  >
-    <path d="M12.428 2.928a7.5 7.5 0 0 1 9.143 9.143 3 3 0 0 1-2.028 2.029l-3.57.714-2.214 2.214c.174.59.24 1.08.204 1.43-.064.616-.339 1.31-.906 1.877-.828.828-2.202.856-3.016.042-.813-.814-.785-2.188.042-3.016.567-.567 1.261-.842 1.877-.906.35-.036.84.03 1.43.204l2.214-2.214.714-3.57A3 3 0 0 1 19.5 9.357a7.5 7.5 0 0 1-9.143-9.143a2 2 0 0 1 2.071 2.071ZM15.072 15.072a1 1 0 0 1-1.414 0L3.515 4.93a1 1 0 1 1 1.414-1.414L15.072 13.657a1 1 0 0 1 0 1.414Z" />
-  </svg>
-</Link>
+        About Our
+        <Link
+          href="/"
+          className="hover:text-green-300 text-3xl sm:text-4xl md:text-5xl flex items-center justify-center"
+        >
+          <span>Burrr</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-5 h-5 text-green-500"
+          >
+            <path d="M12.428 2.928a7.5 7.5 0 0 1 9.143 9.143 3 3 0 0 1-2.028 2.029l-3.57.714-2.214 2.214c.174.59.24 1.08.204 1.43-.064.616-.339 1.31-.906 1.877-.828.828-2.202.856-3.016.042-.813-.814-.785-2.188.042-3.016.567-.567 1.261-.842 1.877-.906.35-.036.84.03 1.43.204l2.214-2.214.714-3.57A3 3 0 0 1 19.5 9.357a7.5 7.5 0 0 1-9.143-9.143a2 2 0 0 1 2.071 2.071ZM15.072 15.072a1 1 0 0 1-1.414 0L3.515 4.93a1 1 0 1 1 1.414-1.414L15.072 13.657a1 1 0 0 1 0 1.414Z" />
+          </svg>
+        </Link>
       </motion.h1>
 
       <motion.div
@@ -119,8 +132,8 @@ const About = () => {
         </motion.div>
       </motion.div>
 
-       {/* Connect with Me Section */}
-       <motion.div
+      {/* Connect with Me Section */}
+      <motion.div
         variants={itemVariants}
         className="mt-16 w-full max-w-4xl bg-white shadow-lg rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center"
       >
@@ -162,8 +175,6 @@ const About = () => {
             className="flex flex-col items-center text-gray-700 hover:text-indigo-600 transition-all duration-300"
           >
             <FaTwitter size={48} className="mb-2" />
-            
-            
             <span className="text-lg font-medium">X</span>
           </a>
         </div>
@@ -190,8 +201,6 @@ const About = () => {
           {isLoggedIn ? "Create a Post" : "Get Started"}
         </motion.button>
       </motion.div>
-
-     
     </motion.div>
   );
 };

@@ -13,6 +13,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+    const [error, setError] = useState(null); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -141,7 +142,7 @@ const Register = () => {
             </motion.div>
           </form>
 
-          {/* {error && (
+          {error && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -149,7 +150,7 @@ const Register = () => {
             >
               {error.message}
             </motion.div>
-          )} */}
+          )}
 
           <motion.div
             initial={{ opacity: 0 }}

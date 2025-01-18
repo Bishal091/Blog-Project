@@ -24,6 +24,11 @@ const Header = () => {
     router.push("/login");
   };
 
+  // Utility function to check if a link is active
+  const isActiveLink = (path) => {
+    return router.pathname === path;
+  };
+
   return (
     <header className="bg-gray-800 text-white shadow-lg left-0 w-full z-50 sticky top-0">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
@@ -48,13 +53,33 @@ const Header = () => {
             className="flex items-center gap-16"
           >
             <li>
-              <Link href="/" className="hover:text-white transition duration-300">
+              <Link
+                href="/"
+                className={`hover:text-white transition duration-300 ${
+                  isActiveLink("/") ? "text-blue-500" : "text-gray-300"
+                }`}
+              >
                 Home
               </Link>
             </li>
             <li>
-              <Link href="/create-post" className="hover:text-white text-start flex items-center transition duration-300">
+              <Link
+                href="/create"
+                className={`hover:text-white text-start flex items-center transition duration-300 ${
+                  isActiveLink("/create") ? "text-blue-500" : "text-gray-300"
+                }`}
+              >
                 Post <FaPlus size={10} className="inline-block" />
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/about"
+                className={`hover:text-white transition duration-300 ${
+                  isActiveLink("/about") ? "text-blue-500" : "text-gray-300"
+                }`}
+              >
+                About
               </Link>
             </li>
             {isLoggedIn ? (
@@ -69,12 +94,22 @@ const Header = () => {
             ) : (
               <>
                 <li>
-                  <Link href="/register" className="hover:text-white transition duration-300">
+                  <Link
+                    href="/register"
+                    className={`hover:text-white transition duration-300 ${
+                      isActiveLink("/register") ? "text-blue-500" : "text-gray-300"
+                    }`}
+                  >
                     Register
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-white transition duration-300">
+                  <Link
+                    href="/login"
+                    className={`hover:text-white transition duration-300 ${
+                      isActiveLink("/login") ? "text-blue-500" : "text-gray-300"
+                    }`}
+                  >
                     Login
                   </Link>
                 </li>

@@ -11,11 +11,13 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); // State to manage error messages
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null); // Reset error state before making the request
 
     try {
       const { token, user } = await loginUser({ username, password });
@@ -24,6 +26,7 @@ const Login = () => {
       toast.success("Login successful!");
       router.push("/");
     } catch (error) {
+      setError(error.message); // Set the error message
       toast.error("Login failed: " + error.message);
     } finally {
       setLoading(false);
@@ -117,15 +120,17 @@ const Login = () => {
               </button>
             </motion.div>
           </form>
-          {/* {error && (
+
+          {/* Error Message Display */}
+          {error && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="text-red-500 text-center mt-4"
             >
-              {error.message}
+              {error}
             </motion.div>
-          )} */}
+          )}
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -136,11 +141,11 @@ const Login = () => {
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
               <Link
-                      href="/register"
-                      className="text-indigo-600 hover:text-indigo-800"
-                    >
-                      Signup
-                    </Link>
+                href="/register"
+                className="text-indigo-600 hover:text-indigo-800"
+              >
+                Signup
+              </Link>
             </p>
           </motion.div>
         </div>
