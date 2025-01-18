@@ -1,20 +1,16 @@
 import pool from '../../lib/db';
+import { authMiddleware } from '../../lib/authMiddleware';
 
-export default async function handler(req, res) {
-  if (req.method === 'GET') {
-    // Fetch comments for a post
-    const { postId } = req.query;
-    const { rows } = await pool.query('SELECT * FROM comments WHERE post_id = $1', [postId]);
-    res.status(200).json(rows);
-  } else if (req.method === 'POST') {
-    // Create a new comment
-    const { content, user_id, post_id } = req.body;
-    const { rows } = await pool.query(
-      'INSERT INTO comments (content, user_id, post_id) VALUES ($1, $2, $3) RETURNING *',
-      [content, user_id, post_id]
-    );
-    res.status(201).json(rows[0]);
-  } else {
-    res.status(405).json({ message: 'Method not allowed' });
-  }
-}
+const createCommentHandler = async (req, res) => {
+  const { postId, content } = req.body;
+  const userId = req.user.userId; // User ID from the token
+
+  const { rows } = await pool.query(
+    'INSERT INTO comments (content, user_id, post_id) VALUES ($1, $2, $3) RETURNING *',
+    [content, userId, postId]
+  );
+
+  res.status(201).json(rows[0]);
+};
+
+export default authMiddleware(createCommentHandler);
