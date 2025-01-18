@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { fetchPostDetails, createComment } from "../lib/api";
 import { motion } from "framer-motion";
@@ -37,12 +37,13 @@ const PostDetail = () => {
     }
 
     try {
-      await createComment(id, comment, token);
+      const newComment = await createComment(id, comment, token);
       setComment("");
       toast.success("Comment added successfully!");
-      // Refetch post details to update comments
-      const updatedPost = await fetchPostDetails(id);
-      setPost(updatedPost);
+      setPost((prevPost) => ({
+        ...prevPost,
+        comments: [...prevPost.comments, newComment], // Append the new comment
+      }));
     } catch (error) {
       toast.error("Error adding comment: " + error.message);
     }
@@ -72,7 +73,7 @@ const PostDetail = () => {
             <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
             <p className="text-gray-700 mb-4">{post.content}</p>
             <p className="text-sm text-gray-500">
-              Author: <span className="font-bold">{post.author.username}</span> |{" "}
+              Author: <span className="font-bold">{post.author_username}</span> |{" "}
               {new Date(post.created_at).toLocaleString()}
             </p>
           </div>
@@ -98,7 +99,7 @@ const PostDetail = () => {
           className="mb-8"
         >
           <h2 className="text-2xl font-bold mb-4">Comments</h2>
-          {post.comments.length === 0 ? (
+          {post.comments && post.comments.length === 0 ? (
             <p className="text-gray-500">No comments yet. Be the first to comment!</p>
           ) : (
             <ul>
@@ -112,7 +113,7 @@ const PostDetail = () => {
                 >
                   <p className="text-gray-700">{comment.content}</p>
                   <p className="text-sm text-gray-500">
-                    By: <span className="font-bold">{comment.author.username}</span> |{" "}
+                    By: <span className="font-bold">{comment.author_username}</span> |{" "}
                     {new Date(comment.created_at).toLocaleString()}
                   </p>
                 </motion.li>

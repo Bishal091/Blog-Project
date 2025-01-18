@@ -23,7 +23,8 @@ const CreatePost = () => {
 
     try {
       setLoading(true);
-      await createPost({ title, content, tags: tags.split(",").map((tag) => tag.trim()) }, token);
+      // await createPost({ title, content, tags: tags.split(",").map((tag) => tag.trim()) }, token);
+      await createPost({ title, content}, token);
       setLoading(false);
       router.push("/");
       setError(null);

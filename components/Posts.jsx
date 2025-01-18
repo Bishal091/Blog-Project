@@ -3,22 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import { fetchPosts, likePost } from "../lib/api";
-import {
-  FaHeart,
-  FaRegHeart,
-  FaComment,
-  FaSpinner,
-  FaEllipsisV,
-  FaUser,
-  FaEdit,
-  FaSearch,
-  FaSortAmountDown,
-  FaSortAmountUp,
-  FaRocket,
-  FaUsers,
-  FaTag,
-  FaShareAlt,
-} from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaComment, FaSpinner, FaEllipsisV, FaUser, FaEdit, FaSearch, FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const formatDate = (timestamp) => {
@@ -80,7 +65,7 @@ const Posts = () => {
     const loadPosts = async () => {
       try {
         const data = await fetchPosts();
-        setPosts(data);
+        setPosts(data.posts);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -99,13 +84,13 @@ const Posts = () => {
     }
 
     try {
-      const updatedPost = await likePost(postId, token);
+      const response = await likePost(postId, token);
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post.id === postId
             ? {
                 ...post,
-                likes: updatedPost.likes,
+                likes: response.likes,
               }
             : post
         )
@@ -117,8 +102,8 @@ const Posts = () => {
 
   const isPostLiked = (postId) => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) return false;
     const post = posts.find((p) => p.id === postId);
+    if (!user || !post.likes) return false;
     return post.likes.some((like) => like.user_id === user.id);
   };
 
@@ -128,7 +113,7 @@ const Posts = () => {
       if (sortBy === "date") {
         return new Date(b.created_at) - new Date(a.created_at);
       } else if (sortBy === "likes") {
-        return b.likes.length - a.likes.length;
+        return (b.likes?.length || 0) - (a.likes?.length || 0);
       } else if (sortBy === "title") {
         return a.title.localeCompare(b.title);
       }
@@ -243,37 +228,19 @@ const Posts = () => {
                       <FaUser className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-800">{post.author.username}</h3>
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {post.author ? post.author.username : "Unknown User"}
+                      </h3>
                       <p className="text-sm text-gray-500">{formatDate(post.created_at)}</p>
                     </div>
                   </div>
-                  <PostOptionsMenu postId={post.id} authorId={post.author.id} />
+                  <PostOptionsMenu postId={post.id} authorId={post.author?.id} />
                 </div>
                 <Link href={`/post/${post.id}`} className="block">
                   <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-indigo-600 transition">{post.title}</h2>
                   <p className="text-gray-600 mb-4 line-clamp-3">{post.content}</p>
                 </Link>
               </div>
-              {post.tags && post.tags.length > 0 && (
-                <div className="flex items-end justify-end space-x-2 p-1">
-                  {post.tags.slice(0, 2).map((tag, index) => (
-                    <span
-                      key={index}
-                      className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full hover:bg-gray-200 transition"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                  {post.tags.length > 2 && (
-                    <Link
-                      href={`/post/${post.id}`}
-                      className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full hover:bg-gray-200 transition"
-                    >
-                      +{post.tags.length - 2}
-                    </Link>
-                  )}
-                </div>
-              )}
               <div className="flex justify-between items-center p-3 border-t border-gray-100">
                 <div className="flex items-center space-x-4">
                   <button
@@ -281,17 +248,17 @@ const Posts = () => {
                     className="flex items-center space-x-1 text-red-500 hover:text-red-600"
                   >
                     {isPostLiked(post.id) ? <FaHeart size={24} /> : <FaRegHeart size={24} />}
-                    <span className="text-sm">{post.likes.length}</span>
+                    <span className="text-sm">{post.likes?.length || 0}</span>
                   </button>
                   <Link
-                    href={`/post/${post.id}`}
+                    href={`/posts/${post.id}`}
                     className="flex items-center space-x-1 text-gray-500 hover:text-gray-600"
                   >
                     <FaComment size={24} />
-                    <span className="text-sm">{post.comments.length}</span>
+                    <span className="text-sm">{post.comments?.length || 0}</span>
                   </Link>
                 </div>
-                <Link href={`/post/${post.id}`} className="text-indigo-600 hover:text-indigo-700 font-medium text-sm">
+                <Link href={`/posts/${post.id}`} className="text-indigo-600 hover:text-indigo-700 font-medium text-sm">
                   Read More
                 </Link>
               </div>
